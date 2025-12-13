@@ -10,8 +10,6 @@ von Friedrich Riedhammer, DJ2RF
 Der Fokus liegt auf **praxisnahen Python-Beispielen** für den
 **ADALM-Pluto SDR** von Analog Devices.
 
----
-
 ## Ziel dieses Repositories
 
 - Ergänzung zum Buch (kein Ersatz)
@@ -20,8 +18,6 @@ Der Fokus liegt auf **praxisnahen Python-Beispielen** für den
 - saubere Trennung von:
   - Kapitel-Beispielen
   - wiederverwendbaren Hilfsfunktionen (Anhang A)
-
----
 
 ## Inhalt & Struktur
 
@@ -37,17 +33,12 @@ Der Fokus liegt auf **praxisnahen Python-Beispielen** für den
 │ └── requirements.txt
 └── README.md # Diese Datei
 
-
----
-
 ## Voraussetzungen
 
 - ADALM-Pluto SDR
 - Linux (Ubuntu/Debian empfohlen)
 - Python ≥ 3.9
 - Grundkenntnisse in Python und Signalverarbeitung sind hilfreich
-
----
 
 ## Schnellstart (empfohlen)
 
@@ -58,8 +49,6 @@ Der Fokus liegt auf **praxisnahen Python-Beispielen** für den
 
 Dort sind alle Schritte zur Einrichtung einer funktionierenden
 Python-Umgebung mit `pyadi-iio` beschrieben.
-
----
 
 ## Die utils-Bibliothek (Anhang A)
 
@@ -74,6 +63,6 @@ Sie enthält u. a.:
 - Messfunktionen (Noise Floor, SNR, IMD)
 
 👉 Einstieg & Test:
-```bash
+
 python python/utils/utils_sample.py
 

@@ -1,0 +1,80 @@
+# --------------------------------------------------
+# Python
+# --------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# --------------------------------------------------
+# SDR / Signal Data
+# --------------------------------------------------
+# IQ data, recordings, intermediate results
+*.npy
+*.npz
+*.dat
+*.bin
+*.iq
+*.raw
+*.wav
+
+# GNU Radio
+*.grc~
+*.pyc~
+
+# --------------------------------------------------
+# Plots / Figures
+# --------------------------------------------------
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.pdf
+
+# --------------------------------------------------
+# Logs / Temp
+# --------------------------------------------------
+*.log
+*.tmp
+*.bak
+*~
+
+# --------------------------------------------------
+# OS / Editor
+# --------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# JetBrains / PyCharm
+.idea/
+
+# --------------------------------------------------
+# SDR / Pluto specifics
+# --------------------------------------------------
+# Temporary Pluto captures / debug
+pluto_*.npy
+*_iq.npy
+*_rx.npy
+*_tx.npy
+
+# --------------------------------------------------
+# Optional: Keep example data
+# --------------------------------------------------
+# Uncomment if you want to allow small example files
+# !examples/data/*.npy
