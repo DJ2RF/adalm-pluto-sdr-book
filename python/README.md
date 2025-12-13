@@ -1,12 +1,79 @@
-# 1. Stellen Sie sicher, dass das venv-Modul installiert ist (falls noch nicht geschehen)
-sudo apt update
-sudo apt install python3-full
+# ADALM-Pluto SDR – Begleitmaterial zum Praxisbuch
 
-# 2. Erstellen Sie eine virtuelle Umgebung im aktuellen Verzeichnis (z.B. mit dem Namen "venv")
-python3 -m venv venv
+Dieses Repository enthält den **begleitenden Quellcode, Beispiele und Materialien**
+zum Buch
 
-# 3. Aktivieren Sie die virtuelle Umgebung
-source venv/bin/activate
+**„ADALM-Pluto SDR – Praxisbuch für Software Defined Radio“**  
+von Friedrich Riedhammer, DJ2RF  
+(Nerd Verlag)
 
-# 4. Installieren Sie das Paket mit pip3 (jetzt innerhalb der venv)
-pip3 install pyadi-iio
+Der Fokus liegt auf **praxisnahen Python-Beispielen** für den
+**ADALM-Pluto SDR** von Analog Devices.
+
+---
+
+## Ziel dieses Repositories
+
+- Ergänzung zum Buch (kein Ersatz)
+- lauffähige, verständliche Python-Beispiele
+- reproduzierbare Experimente mit realen Funksignalen
+- saubere Trennung von:
+  - Kapitel-Beispielen
+  - wiederverwendbaren Hilfsfunktionen (Anhang A)
+
+---
+
+## Inhalt & Struktur
+
+.
+├── python/
+│ ├── utils/ # Hilfsbibliothek (Anhang A)
+│ ├── chapter_03_... # Kapitelbezogene Beispiele
+│ ├── chapter_04_...
+│ ├── chapter_08_...
+│ ├── chapter_10_...
+│ ├── chapter_11_...
+│ ├── ENV_SETUP.md # Ausführliche Installationsanleitung
+│ └── requirements.txt
+└── README.md # Diese Datei
+
+
+---
+
+## Voraussetzungen
+
+- ADALM-Pluto SDR
+- Linux (Ubuntu/Debian empfohlen)
+- Python ≥ 3.9
+- Grundkenntnisse in Python und Signalverarbeitung sind hilfreich
+
+---
+
+## Schnellstart (empfohlen)
+
+1. Repository klonen
+2. **Installationsanleitung lesen:**
+
+👉 **[`python/ENV_SETUP.md`](python/ENV_SETUP.md)**
+
+Dort sind alle Schritte zur Einrichtung einer funktionierenden
+Python-Umgebung mit `pyadi-iio` beschrieben.
+
+---
+
+## Die utils-Bibliothek (Anhang A)
+
+Im Verzeichnis `python/utils` befindet sich eine kleine Hilfsbibliothek,
+die im Buch als **Anhang A** beschrieben ist.
+
+Sie enthält u. a.:
+
+- Pluto-Initialisierung & RX/TX-Konfiguration
+- DSP-Grundfunktionen (FFT, dB, Fenster)
+- einfache Demodulatoren (AM/FM)
+- Messfunktionen (Noise Floor, SNR, IMD)
+
+👉 Einstieg & Test:
+```bash
+python python/utils/utils_sample.py
+
