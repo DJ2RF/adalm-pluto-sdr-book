@@ -1,0 +1,270 @@
+options:
+  parameters:
+    author: 'DJ2RF'
+    catch_exceptions: 'True'
+    category: '[Digital Demos]'
+    comment: 'FSK demo (no hardware): generate 2-FSK + simple demod'
+    description: '2-FSK generator + quadrature demod + clock recovery'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: fsk_demo
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    title: 2-FSK Demo (Baseband)
+    window_size: (1300,780)
+  states:
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '200000'
+  states:
+    coordinate: [120, 20]
+    state: enabled
+
+- name: baud
+  id: variable
+  parameters:
+    value: '1200'
+  states:
+    coordinate: [260, 20]
+    state: enabled
+
+- name: sps
+  id: variable
+  parameters:
+    value: 'int(samp_rate/baud)'
+  states:
+    coordinate: [380, 20]
+    state: enabled
+
+- name: f_dev
+  id: variable
+  parameters:
+    value: '5000'
+  states:
+    coordinate: [560, 20]
+    state: enabled
+
+- name: sens
+  id: variable
+  parameters:
+    value: '2*math.pi*f_dev/samp_rate'
+  states:
+    coordinate: [700, 20]
+    state: enabled
+
+# Random bits 0/1
+- name: analog_random_source_x_0
+  id: analog_random_source_x
+  parameters:
+    type: byte
+    min: '0'
+    max: '2'
+    seed: '0'
+  states:
+    coordinate: [120, 150]
+    state: true
+
+# Map 0/1 -> -1/+1 (float symbols)
+- name: digital_chunks_to_symbols_xx_0
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    dimension: '1'
+    dtype: float
+    symbol_table: '[-1.0, 1.0]'
+  states:
+    coordinate: [320, 150]
+    state: true
+
+# Repeat each symbol to samples-per-symbol
+- name: blocks_repeat_0
+  id: blocks_repeat
+  parameters:
+    type: float
+    interp: sps
+  states:
+    coordinate: [520, 150]
+    state: true
+
+# Scale a bit (optional) to clean up demod levels
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    type: float
+    const: '1.0'
+  states:
+    coordinate: [700, 150]
+    state: true
+
+# Frequency modulator: produces complex 2-FSK
+- name: analog_frequency_modulator_fc_0
+  id: analog_frequency_modulator_fc
+  parameters:
+    sensitivity: sens
+  states:
+    coordinate: [880, 150]
+    state: true
+
+# Throttle (since no hardware source)
+- name: blocks_throttle_0
+  id: blocks_throttle
+  parameters:
+    type: complex
+    samples_per_second: samp_rate
+    ignoretag: 'True'
+  states:
+    coordinate: [1060, 150]
+    state: true
+
+# ---------- RX / Demod ----------
+# Quadrature FM demod (turn phase changes into frequency estimate)
+- name: analog_quadrature_demod_cf_0
+  id: analog_quadrature_demod_cf
+  parameters:
+    gain: '1.0'
+  states:
+    coordinate: [120, 360]
+    state: true
+
+# Low-pass to smooth discriminator output
+- name: low_pass_filter_0
+  id: low_pass_filter
+  parameters:
+    decim: '1'
+    gain: '1'
+    samp_rate: samp_rate
+    cutoff_freq: '6000'
+    transition_width: '2000'
+    window: window.WIN_HAMMING
+    beta: '6.76'
+  states:
+    coordinate: [320, 360]
+    state: true
+
+# Clock recovery (float -> float, 1 sample per symbol at output)
+- name: digital_clock_recovery_mm_xx_0
+  id: digital_clock_recovery_mm_xx
+  parameters:
+    dtype: float
+    omega: 'sps'
+    gain_omega: '0.25*0.175*0.175'
+    mu: '0.5'
+    gain_mu: '0.175'
+    omega_relative_limit: '0.005'
+  states:
+    coordinate: [540, 360]
+    state: true
+
+# Binary slicer: float -> byte (0/1)
+- name: digital_binary_slicer_fb_0
+  id: digital_binary_slicer_fb
+  parameters: {}
+  states:
+    coordinate: [760, 360]
+    state: true
+
+# ---------- GUI ----------
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    fftsize: '2048'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    fc: '0'
+    bw: samp_rate
+    update_time: '0.10'
+    ymin: '-140'
+    ymax: '10'
+    legend: 'True'
+    name: '""'
+    nconnections: '1'
+    freqhalf: 'True'
+    autoscale: 'False'
+    average: '1.0'
+    grid: 'False'
+    axislabels: 'True'
+    ctrlpanel: 'False'
+    gui_hint: ''
+    label: FSK Spectrum (Baseband)
+    units: dB
+    showports: 'False'
+    norm_window: 'False'
+  states:
+    coordinate: [1060, 260]
+    state: true
+
+- name: qtgui_time_sink_x_0
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    samp_rate: samp_rate
+    size: '2000'
+    name: '""'
+    nconnections: '1'
+    update_time: '0.10'
+    ymin: '-2'
+    ymax: '2'
+    grid: 'True'
+    autoscale: 'False'
+    axislabels: 'True'
+    gui_hint: ''
+    label1: 'Discriminator'
+  states:
+    coordinate: [120, 520]
+    state: true
+
+- name: qtgui_time_sink_x_1
+  id: qtgui_time_sink_x
+  parameters:
+    type: byte
+    samp_rate: baud
+    size: '400'
+    name: '""'
+    nconnections: '1'
+    update_time: '0.10'
+    ymin: '-0.5'
+    ymax: '1.5'
+    grid: 'True'
+    autoscale: 'False'
+    axislabels: 'True'
+    gui_hint: ''
+    label1: 'Recovered Bits (0/1)'
+  states:
+    coordinate: [760, 520]
+    state: true
+
+connections:
+# TX path
+- [analog_random_source_x_0, '0', digital_chunks_to_symbols_xx_0, '0']
+- [digital_chunks_to_symbols_xx_0, '0', blocks_repeat_0, '0']
+- [blocks_repeat_0, '0', blocks_multiply_const_vxx_0, '0']
+- [blocks_multiply_const_vxx_0, '0', analog_frequency_modulator_fc_0, '0']
+- [analog_frequency_modulator_fc_0, '0', blocks_throttle_0, '0']
+
+# GUI spectrum of generated FSK
+- [blocks_throttle_0, '0', qtgui_freq_sink_x_0, '0']
+
+# Demod path
+- [blocks_throttle_0, '0', analog_quadrature_demod_cf_0, '0']
+- [analog_quadrature_demod_cf_0, '0', low_pass_filter_0, '0']
+- [low_pass_filter_0, '0', digital_clock_recovery_mm_xx_0, '0']
+- [digital_clock_recovery_mm_xx_0, '0', digital_binary_slicer_fb_0, '0']
+
+# GUI time views
+- [low_pass_filter_0, '0', qtgui_time_sink_x_0, '0']
+- [digital_binary_slicer_fb_0, '0', qtgui_time_sink_x_1, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.5.1

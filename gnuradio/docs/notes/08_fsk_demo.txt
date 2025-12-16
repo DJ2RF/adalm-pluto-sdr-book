@@ -1,0 +1,19 @@
+
+What you can adjust (without breaking it):
+
+baud (e.g., 1200 / 2400)
+
+f_dev (e.g., 2000…8000)
+
+samp_rate (e.g., 200k or 500k)
+
+
+
+
+Was du einstellen kannst (ohne dass es kaputt geht)
+
+baud (z. B. 1200 / 2400)
+
+f_dev (z. B. 2000…8000)
+
+samp_rate (z. B. 200k oder 500k)
