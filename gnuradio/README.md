@@ -19,32 +19,6 @@ The focus is on **practical, reproducible SDR experiments** using the
 
 > ⚠️ Note: Pluto support requires `libiio` and the GNU Radio IIO blocks.
 
----
-
-## Directory Structure
-
-gnuradio/
-├── README.md # This file
-├── ENV_SETUP.md # GNU Radio & Pluto specific setup notes
-│
-├── grc/ # GNU Radio Companion flowgraphs
-│ ├── 00_spectrum_viewer.grc
-│ ├── 01_waterfall_viewer.grc
-│ ├── 02_iq_recorder.grc
-│ └── ...
-│
-├── python/ # Exported or hand-written Python scripts
-│ ├── spectrum_viewer.py
-│ └── ...
-│
-├── docs/
-│ ├── notes/ # Short explanations per experiment
-│ └── screenshots/ # GRC flowgraphs & result screenshots
-│
-└── data/
-├── iq_recordings/ # Optional IQ sample recordings
-└── audio/ # Demodulated audio output
-
 ## Available Experiments
 
 | ID | Flowgraph | Description |
