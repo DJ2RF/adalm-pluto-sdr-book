@@ -78,3 +78,10 @@ pluto_*.npy
 # --------------------------------------------------
 # Uncomment if you want to allow small example files
 # !examples/data/*.npy
+
+# GNU Radio recordings (do not commit)
+gnuradio/data/iq_recordings/
+*.cfile
+*.iq
+*.raw
+*.wav
