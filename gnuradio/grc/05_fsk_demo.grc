@@ -1,0 +1,228 @@
+options:
+  parameters:
+    author: ''
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    comment: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: nbfm_receiver
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    title: NBFM Receiver (Pluto)
+    window_size: (1200,780)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '2000000'
+  states:
+    coordinate: [150, 12]
+    rotation: 0
+    state: enabled
+
+- name: f_rx
+  id: variable
+  parameters:
+    value: '145500000'
+  states:
+    coordinate: [350, 12]
+    rotation: 0
+    state: enabled
+
+- name: quad_rate
+  id: variable
+  parameters:
+    value: '200000'
+  states:
+    coordinate: [560, 12]
+    rotation: 0
+    state: enabled
+
+- name: audio_rate
+  id: variable
+  parameters:
+    value: '48000'
+  states:
+    coordinate: [760, 12]
+    rotation: 0
+    state: enabled
+
+- name: max_dev
+  id: variable
+  parameters:
+    value: '2500'
+  states:
+    coordinate: [950, 12]
+    rotation: 0
+    state: enabled
+
+- name: tau
+  id: variable
+  parameters:
+    value: '300e-6'
+  states:
+    coordinate: [1080, 12]
+    rotation: 0
+    state: enabled
+
+- name: iio_pluto_source_0
+  id: iio_pluto_source
+  parameters:
+    uri: ip:pluto.local
+    samplerate: samp_rate
+    bandwidth: samp_rate
+    frequency: f_rx
+    gain1: '''slow_attack'''
+    manual_gain1: '64'
+    quadrature: 'True'
+    rfdc: 'True'
+    bbdc: 'True'
+    buffer_size: '32768'
+    type: fc32
+  states:
+    coordinate: [120, 220]
+    rotation: 0
+    state: true
+
+# Channel select + decimation: 2 MS/s -> 200 kS/s
+- name: low_pass_filter_0
+  id: low_pass_filter
+  parameters:
+    decim: '10'
+    gain: '1'
+    samp_rate: samp_rate
+    cutoff_freq: '15000'
+    transition_width: '5000'
+    window: window.WIN_HAMMING
+    beta: '6.76'
+  states:
+    coordinate: [360, 220]
+    rotation: 0
+    state: true
+
+# Quadrature FM demod
+# gain = quad_rate / (2*pi*max_dev)
+- name: analog_quadrature_demod_cf_0
+  id: analog_quadrature_demod_cf
+  parameters:
+    gain: (quad_rate)/(2*math.pi*max_dev)
+  states:
+    coordinate: [560, 220]
+    rotation: 0
+    state: true
+
+# De-emphasis (typical NFM voice: 300 µs in many regions)
+- name: analog_deemph_0
+  id: analog_deemph
+  parameters:
+    samp_rate: quad_rate
+    tau: tau
+  states:
+    coordinate: [760, 220]
+    rotation: 0
+    state: true
+
+# Voice audio low-pass
+- name: low_pass_filter_1
+  id: low_pass_filter
+  parameters:
+    decim: '1'
+    gain: '1'
+    samp_rate: quad_rate
+    cutoff_freq: '3500'
+    transition_width: '1500'
+    window: window.WIN_HAMMING
+    beta: '6.76'
+  states:
+    coordinate: [960, 220]
+    rotation: 0
+    state: true
+
+# 200 kS/s -> 48 kS/s  ( *6 /25 )
+- name: rational_resampler_xxx_0
+  id: rational_resampler_xxx
+  parameters:
+    interp: '6'
+    decim: '25'
+    taps: ''
+    fractional_bw: '0.4'
+  states:
+    coordinate: [1120, 220]
+    rotation: 0
+    state: true
+
+- name: audio_sink_0
+  id: audio_sink
+  parameters:
+    samp_rate: audio_rate
+    device_name: ''
+    ok_to_block: 'True'
+  states:
+    coordinate: [1120, 340]
+    rotation: 0
+    state: true
+
+# Optional: live spectrum view
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    fftsize: '1024'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    fc: f_rx
+    bw: samp_rate
+    update_time: '0.10'
+    ymin: '-140'
+    ymax: '10'
+    legend: 'True'
+    name: '""'
+    nconnections: '1'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.0'
+    tr_tag: '""'
+    freqhalf: 'True'
+    autoscale: 'False'
+    average: '1.0'
+    grid: 'False'
+    axislabels: 'True'
+    ctrlpanel: 'False'
+    gui_hint: ''
+    label: RX Spectrum
+    units: dB
+    showports: 'False'
+    norm_window: 'False'
+  states:
+    coordinate: [360, 450]
+    rotation: 0
+    state: true
+
+connections:
+- [iio_pluto_source_0, '0', low_pass_filter_0, '0']
+- [low_pass_filter_0, '0', analog_quadrature_demod_cf_0, '0']
+- [analog_quadrature_demod_cf_0, '0', analog_deemph_0, '0']
+- [analog_deemph_0, '0', low_pass_filter_1, '0']
+- [low_pass_filter_1, '0', rational_resampler_xxx_0, '0']
+- [rational_resampler_xxx_0, '0', audio_sink_0, '0']
+- [iio_pluto_source_0, '0', qtgui_freq_sink_x_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.5.1

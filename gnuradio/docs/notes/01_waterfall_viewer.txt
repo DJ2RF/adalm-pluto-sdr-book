@@ -1,0 +1,40 @@
+Deutsch unten.
+
+✔ What this flowgraph does
+Pluto RX @ 100 MHz
+2 MS/s
+Pure Waterfall (Time/Frequency)
+Ideal for:
+Finding carriers
+Seeing bursts
+Identifying FM/Digital signals
+Monitoring satellite passes
+🔧 Typical tweaks (recommended)
+During operation:
+Change f0 (e.g., 145e6, 433e6)
+Gain:
+Set manual_gain1 to 30–70
+FFT Size:
+2048 for better resolution
+update_time:
+0.05 for faster response
+
+
+✔ Was dieses Flowgraph macht
+Pluto RX @ 100 MHz
+2 MS/s
+Reiner Waterfall (Zeit/Frequenz)
+Ideal zum:
+Träger finden
+Bursts sehen
+FM / Digital-Signale erkennen
+Sat-Pässe beobachten
+🔧 Typische Spielereien (empfohlen)
+Im laufenden Betrieb:
+f0 ändern (z. B. 145e6, 433e6)
+Gain:
+manual_gain1 auf 30–70
+FFT Size:
+2048 für bessere Auflösung
+update_time:
+0.05 für schnellere Reaktion

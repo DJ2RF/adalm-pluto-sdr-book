@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: Spectrum Viewer (Pluto)
+# Title: IQ Recorder (Pluto)
 # GNU Radio version: 3.10.5.1
 
 from packaging.version import Version as StrictVersion
@@ -24,6 +24,7 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 from gnuradio.filter import firdes
 import sip
+from gnuradio import blocks
 from gnuradio import gr
 from gnuradio.fft import window
 import sys
@@ -37,12 +38,12 @@ from gnuradio import iio
 
 from gnuradio import qtgui
 
-class spectrum_viewer(gr.top_block, Qt.QWidget):
+class iq_recorder(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "Spectrum Viewer (Pluto)", catch_exceptions=True)
+        gr.top_block.__init__(self, "IQ Recorder (Pluto)", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Spectrum Viewer (Pluto)")
+        self.setWindowTitle("IQ Recorder (Pluto)")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -60,7 +61,7 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "spectrum_viewer")
+        self.settings = Qt.QSettings("GNU Radio", "iq_recorder")
 
         try:
             if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
@@ -74,6 +75,7 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 2000000
+        self.out_file = out_file = '../data/iq_recordings/pluto_iq_2Msps_100MHz.cfile'
         self.f0 = f0 = 100000000
 
         ##################################################
@@ -91,7 +93,7 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         )
         self.qtgui_freq_sink_x_0.set_update_time(0.10)
         self.qtgui_freq_sink_x_0.set_y_axis((-140), 10)
-        self.qtgui_freq_sink_x_0.set_y_label('Spectrum (RX)', 'dB')
+        self.qtgui_freq_sink_x_0.set_y_label('IQ Recording (Live Spectrum)', 'dB')
         self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
         self.qtgui_freq_sink_x_0.enable_autoscale(False)
         self.qtgui_freq_sink_x_0.enable_grid(False)
@@ -132,16 +134,19 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         self.iio_pluto_source_0.set_rfdc(True)
         self.iio_pluto_source_0.set_bbdc(True)
         self.iio_pluto_source_0.set_filter_params('Auto', '', 0, 0)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, out_file, False)
+        self.blocks_file_sink_0.set_unbuffered(False)
 
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.iio_pluto_source_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.iio_pluto_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "spectrum_viewer")
+        self.settings = Qt.QSettings("GNU Radio", "iq_recorder")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -156,6 +161,13 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         self.iio_pluto_source_0.set_samplerate(self.samp_rate)
         self.qtgui_freq_sink_x_0.set_frequency_range(self.f0, self.samp_rate)
 
+    def get_out_file(self):
+        return self.out_file
+
+    def set_out_file(self, out_file):
+        self.out_file = out_file
+        self.blocks_file_sink_0.open(self.out_file)
+
     def get_f0(self):
         return self.f0
 
@@ -167,7 +179,7 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
 
 
 
-def main(top_block_cls=spectrum_viewer, options=None):
+def main(top_block_cls=iq_recorder, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')

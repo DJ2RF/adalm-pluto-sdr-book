@@ -1,0 +1,48 @@
+Deutsch unten
+
+
+🔧 What you adjust first:
+
+f_rx
+This is the radio frequency (Hz), e.g.:
+
+145.500 MHz → 145500000
+433.500 MHz → 433500000
+PMR 446.00625 MHz → 446006250 (refer to the band plan)
+
+max_dev
+
+2500 = "narrow" (typical PMR/DMR environment, NFM)
+
+5000 = slightly wider (some repeaters/2m)
+If speech is "too quiet/too distorted," max_dev is the first setting to adjust.
+PMR 446.00625 MHz → 446006250 (refer to the band plan)
+2500 = "narrow" (typical PMR/DMR environment, NFM)
+... Tau (De-Emphasis)
+Standard here: 300e-6
+If it sounds too shrill, try:
+750e-6 (US/Broadcast style, sometimes more pleasant)
+If it doesn't work immediately
+test manual_gain1 between 30 and 70
+Check antenna/signal strength
+A peak should be visible in the spectrum
+
+
+🔧 Was du als erstes anpasst
+f_rx
+Das ist die Funkfrequenz (Hz), z.B.:
+145.500 MHz → 145500000
+433.500 MHz → 433500000
+PMR 446.00625 MHz → 446006250 (Bandplan beachten)
+max_dev
+2500 = „narrow“ (typisch PMR/DMR-Umfeld, NFM)
+5000 = etwas breiter (manche Relais/2m)
+Wenn Sprache „zu leise/zu verzerrt“ ist, ist max_dev der erste Regler.
+tau (De-Emphasis)
+Standard hier: 300e-6
+Wenn es zu schrill klingt, testen:
+750e-6 (US/Broadcast-Style, manchmal angenehmer)
+Wenn es nicht sofort läuft
+manual_gain1 zwischen 30…70 testen
+Antenne / Signalstärke checken
+im Spektrum muss ein Peak sichtbar sein

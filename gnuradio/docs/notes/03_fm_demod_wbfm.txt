@@ -1,0 +1,28 @@
+Deutsch unten
+
+✅ What you need to adjust first
+
+Only one variable:
+f_station
+This is the transmitter frequency in Hz. Example:
+100.3 MHz → 100300000
+95.0 MHz → 95000000
+89.0 MHz → 89000000
+Troubleshooting (if you can't hear anything):
+Vary manual_gain1 to 40–70
+Make sure your audio output device works in Linux
+If the FM transmitter is very strong: Lower the gain
+If you don't see any signal at all: Check the antenna/frequency/Pluto URI
+
+✅ Was du als erstes anpassen musst
+Nur eine Variable:
+f_station
+Das ist die Senderfrequenz in Hz. Beispiel:
+100.3 MHz → 100300000
+95.0 MHz → 95000000
+89.0 MHz → 89000000
+Troubleshooting (wenn nix zu hören ist)
+manual_gain1 mal auf 40–70 variieren
+sicherstellen, dass dein Audio-Ausgabegerät in Linux funktioniert
+wenn UKW-Sender sehr stark ist: Gain runter
+wenn du überhaupt kein Signal siehst: Antenne / Frequenz / Pluto URI prüfen

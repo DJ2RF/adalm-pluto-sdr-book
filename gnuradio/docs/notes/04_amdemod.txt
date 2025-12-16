@@ -1,0 +1,22 @@
+Deutsch unten
+
+🔧 What you need to adjust
+
+Only f_station (Hz). Examples:
+MW/AM (depending on region): 1000000 (1.0 MHz)
+Shortwave (if your Pluto/setup covers it): e.g., 7000000 (7 MHz)
+Note: For AM, you obviously need an AM signal within range + a suitable antenna/coupler.
+If you don't hear anything (2 quick checks):
+Vary manual_gain1 by 30–70
+Is f_station really correct? (AM transmitter frequencies vary depending on the country/band)
+
+
+🔧 Was du anpassen musst
+
+Nur f_station (Hz). Beispiele:
+MW/AM (je nach Region): 1000000 (1.0 MHz)
+Kurzwelle (wenn dein Pluto/Setup das abdeckt): z. B. 7000000 (7 MHz)
+Hinweis: Für AM brauchst du natürlich ein AM-Signal in Reichweite + passende Antenne/Ankopplung.
+Wenn du nichts hörst (2 schnelle Checks)
+manual_gain1 mal 30–70 variieren
+f_station stimmt wirklich? (AM-Senderfrequenzen sind je nach Land/Band unterschiedlich)

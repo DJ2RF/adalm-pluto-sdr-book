@@ -1,0 +1,6 @@
+Deutsch unten.
+
+First you need the directory:
+
+cd /home/fritz/adalm-pluto-sdr-book
+mkdir -p gnuradio/data/iq_recordings

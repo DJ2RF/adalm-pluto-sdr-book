@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: Spectrum Viewer (Pluto)
+# Title: Waterfall Viewer (Pluto)
 # GNU Radio version: 3.10.5.1
 
 from packaging.version import Version as StrictVersion
@@ -37,12 +37,12 @@ from gnuradio import iio
 
 from gnuradio import qtgui
 
-class spectrum_viewer(gr.top_block, Qt.QWidget):
+class waterfall_viewer(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "Spectrum Viewer (Pluto)", catch_exceptions=True)
+        gr.top_block.__init__(self, "Waterfall Viewer (Pluto)", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Spectrum Viewer (Pluto)")
+        self.setWindowTitle("Waterfall Viewer (Pluto)")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -60,7 +60,7 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "spectrum_viewer")
+        self.settings = Qt.QSettings("GNU Radio", "waterfall_viewer")
 
         try:
             if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
@@ -80,48 +80,41 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
 
-        self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
+        self.qtgui_waterfall_sink_x_0 = qtgui.waterfall_sink_c(
             1024, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
             f0, #fc
             samp_rate, #bw
             "", #name
-            1,
+            1, #number of inputs
             None # parent
         )
-        self.qtgui_freq_sink_x_0.set_update_time(0.10)
-        self.qtgui_freq_sink_x_0.set_y_axis((-140), 10)
-        self.qtgui_freq_sink_x_0.set_y_label('Spectrum (RX)', 'dB')
-        self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
-        self.qtgui_freq_sink_x_0.enable_autoscale(False)
-        self.qtgui_freq_sink_x_0.enable_grid(False)
-        self.qtgui_freq_sink_x_0.set_fft_average(1.0)
-        self.qtgui_freq_sink_x_0.enable_axis_labels(True)
-        self.qtgui_freq_sink_x_0.enable_control_panel(False)
-        self.qtgui_freq_sink_x_0.set_fft_window_normalized(False)
+        self.qtgui_waterfall_sink_x_0.set_update_time(0.10)
+        self.qtgui_waterfall_sink_x_0.enable_grid(False)
+        self.qtgui_waterfall_sink_x_0.enable_axis_labels(True)
 
 
 
         labels = ['', '', '', '', '',
-            '', '', '', '', '']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ["blue", "red", "green", "black", "cyan",
-            "magenta", "yellow", "dark red", "dark green", "dark blue"]
+                  '', '', '', '', '']
+        colors = [0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0]
         alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
+                  1.0, 1.0, 1.0, 1.0, 1.0]
 
         for i in range(1):
             if len(labels[i]) == 0:
-                self.qtgui_freq_sink_x_0.set_line_label(i, "Data {0}".format(i))
+                self.qtgui_waterfall_sink_x_0.set_line_label(i, "Data {0}".format(i))
             else:
-                self.qtgui_freq_sink_x_0.set_line_label(i, labels[i])
-            self.qtgui_freq_sink_x_0.set_line_width(i, widths[i])
-            self.qtgui_freq_sink_x_0.set_line_color(i, colors[i])
-            self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
+                self.qtgui_waterfall_sink_x_0.set_line_label(i, labels[i])
+            self.qtgui_waterfall_sink_x_0.set_color_map(i, colors[i])
+            self.qtgui_waterfall_sink_x_0.set_line_alpha(i, alphas[i])
 
-        self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self.qtgui_waterfall_sink_x_0.set_intensity_range(-140, 10)
+
+        self._qtgui_waterfall_sink_x_0_win = sip.wrapinstance(self.qtgui_waterfall_sink_x_0.qwidget(), Qt.QWidget)
+
+        self.top_layout.addWidget(self._qtgui_waterfall_sink_x_0_win)
         self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('ip:pluto.local' if 'ip:pluto.local' else iio.get_pluto_uri(), [True, True], 32768)
         self.iio_pluto_source_0.set_len_tag_key('packet_len')
         self.iio_pluto_source_0.set_frequency(f0)
@@ -137,11 +130,11 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.iio_pluto_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
+        self.connect((self.iio_pluto_source_0, 0), (self.qtgui_waterfall_sink_x_0, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "spectrum_viewer")
+        self.settings = Qt.QSettings("GNU Radio", "waterfall_viewer")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -154,7 +147,7 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.iio_pluto_source_0.set_samplerate(self.samp_rate)
-        self.qtgui_freq_sink_x_0.set_frequency_range(self.f0, self.samp_rate)
+        self.qtgui_waterfall_sink_x_0.set_frequency_range(self.f0, self.samp_rate)
 
     def get_f0(self):
         return self.f0
@@ -162,12 +155,12 @@ class spectrum_viewer(gr.top_block, Qt.QWidget):
     def set_f0(self, f0):
         self.f0 = f0
         self.iio_pluto_source_0.set_frequency(self.f0)
-        self.qtgui_freq_sink_x_0.set_frequency_range(self.f0, self.samp_rate)
+        self.qtgui_waterfall_sink_x_0.set_frequency_range(self.f0, self.samp_rate)
 
 
 
 
-def main(top_block_cls=spectrum_viewer, options=None):
+def main(top_block_cls=waterfall_viewer, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')

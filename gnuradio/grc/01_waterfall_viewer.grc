@@ -1,0 +1,92 @@
+options:
+  parameters:
+    author: ''
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    comment: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: waterfall_viewer
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    title: Waterfall Viewer (Pluto)
+    window_size: (1100,700)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '2000000'
+  states:
+    coordinate: [184, 12]
+    rotation: 0
+    state: enabled
+
+- name: f0
+  id: variable
+  parameters:
+    value: '100000000'
+  states:
+    coordinate: [360, 12]
+    rotation: 0
+    state: enabled
+
+- name: iio_pluto_source_0
+  id: iio_pluto_source
+  parameters:
+    uri: ip:pluto.local
+    samplerate: samp_rate
+    bandwidth: samp_rate
+    frequency: f0
+    gain1: '''slow_attack'''
+    manual_gain1: '64'
+    quadrature: 'True'
+    rfdc: 'True'
+    bbdc: 'True'
+    buffer_size: '32768'
+    type: fc32
+  states:
+    coordinate: [152, 200]
+    rotation: 0
+    state: true
+
+- name: qtgui_waterfall_sink_x_0
+  id: qtgui_waterfall_sink_x
+  parameters:
+    type: complex
+    fftsize: '1024'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    fc: f0
+    bw: samp_rate
+    update_time: '0.10'
+    intensity_range: '-140,10'
+    color_map: '0'
+    name: '""'
+    legend: 'True'
+  states:
+    coordinate: [480, 220]
+    rotation: 0
+    state: true
+
+connections:
+- [iio_pluto_source_0, '0', qtgui_waterfall_sink_x_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.5.1
