@@ -1,0 +1,69 @@
+Deutsch unten
+
+🔧 What this test does
+
+Transmits a narrowband CW-like carrier
+Baseband: 1 kHz
+RF: f_tx
+TX power: minimum (attenuation = 0 dB = maximum attenuation!)
+
+⚠️ For Pluto, this means:
+
+Higher attenuation value = less power
+
+Set tx_gain = 0 or higher (10, 20…)
+
+✅ Safe test methods
+1️⃣ Loopback (recommended)
+
+TX → 40–60 dB attenuation → RX
+
+Run a spectrum viewer in parallel
+
+2️⃣ Measuring device
+
+Spectrum analyzer
+
+Dummy load
+
+❌ What you MUST NOT do
+❌ Connect an antenna
+❌ Increase gain without measuring equipment
+❌ “Just a quick test”
+
+License required
+
+
+
+🔧 Was dieser Test macht
+
+Sendet einen schmalbandigen CW-ähnlichen Träger
+Basisband: 1 kHz
+RF: f_tx
+TX-Leistung: minimal (attenuation = 0 dB = maximale Dämpfung!)
+
+⚠️ Beim Pluto bedeutet:
+
+höherer Attenuation-Wert = weniger Leistung
+
+Lass tx_gain = 0 oder höher (10, 20 …)
+
+✅ Sichere Testmethoden
+1️⃣ Loopback (empfohlen)
+
+TX → 40–60 dB Dämpfung → RX
+
+Parallel Spectrum Viewer laufen lassen
+
+2️⃣ Messgerät
+
+Spektrumanalysator
+
+Dummy Load
+
+❌ Was du NICHT tun darfst
+❌ Antenne anschließen
+❌ Gain erhöhen ohne Messmittel
+❌ „nur mal kurz testen“ 
+
+Nur mit Lizenz

@@ -1,0 +1,23 @@
+Deutch unten
+
+Here's how to test it safely (briefly):
+
+First, increase TX_atten: tx_atten = 40 (less power)
+
+Keep tx_amp low: 0.02 … 0.05
+
+Try RX Gain 20…50
+
+You should see a clear peak in the RX spectrum at f0 ± tone_hz (depending on the display, this peak will be "relative" around the center).
+
+
+
+So testest du es sicher (kurz)
+
+TX_atten erstmal hoch: tx_atten = 40 (weniger Leistung)
+
+tx_amp klein lassen: 0.02 … 0.05
+
+RX Gain 20…50 probieren
+
+Du solltest im RX-Spektrum bei f0 ± tone_hz einen klaren Peak sehen (je nach Anzeige “relative” um Center).

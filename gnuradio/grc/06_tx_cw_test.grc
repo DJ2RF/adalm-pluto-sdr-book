@@ -1,0 +1,95 @@
+options:
+  parameters:
+    author: 'DJ2RF'
+    catch_exceptions: 'True'
+    category: '[Pluto TX Tests]'
+    comment: 'CW carrier test – USE DUMMY LOAD ONLY'
+    description: 'Simple CW carrier test using Pluto TX'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: tx_cw_test
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    title: CW TX Test (Pluto) – DUMMY LOAD ONLY
+    window_size: (900,600)
+  states:
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '1000000'
+  states:
+    coordinate: [120, 20]
+    state: enabled
+
+- name: f_tx
+  id: variable
+  parameters:
+    value: '435000000'
+  states:
+    coordinate: [300, 20]
+    state: enabled
+
+- name: tx_gain
+  id: variable
+  parameters:
+    value: '0'
+  states:
+    coordinate: [480, 20]
+    state: enabled
+
+# CW tone (baseband)
+- name: analog_sig_source_x_0
+  id: analog_sig_source_x
+  parameters:
+    waveform: analog.GR_COS_WAVE
+    frequency: '1000'
+    amplitude: '0.2'
+    offset: '0'
+    samp_rate: samp_rate
+    phase: '0'
+    type: float
+  states:
+    coordinate: [120, 160]
+    state: true
+
+# Convert to complex
+- name: blocks_float_to_complex_0
+  id: blocks_float_to_complex
+  parameters: {}
+  states:
+    coordinate: [320, 160]
+    state: true
+
+# Pluto TX
+- name: iio_pluto_sink_0
+  id: iio_pluto_sink
+  parameters:
+    uri: ip:pluto.local
+    samplerate: samp_rate
+    bandwidth: samp_rate
+    frequency: f_tx
+    attenuation: tx_gain
+    cyclic: 'False'
+    buffer_size: '32768'
+  states:
+    coordinate: [560, 160]
+    state: true
+
+connections:
+- [analog_sig_source_x_0, '0', blocks_float_to_complex_0, '0']
+- [blocks_float_to_complex_0, '0', iio_pluto_sink_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.5.1
