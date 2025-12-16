@@ -47,19 +47,13 @@ Adjust frequency, gain, and sample rate as needed
 Export to Python
 In GNU Radio Companion:
 
-arduino
-Code kopieren
 File → Generate → Python Flowgraph
 Pluto URI Examples
 USB / Ethernet (default):
 
-lua
-Code kopieren
 ip:pluto.local
 Static IP:
 
-makefile
-Code kopieren
 ip:192.168.2.1
 Safety Notice ⚠️
 Some flowgraphs may enable transmission (TX).
