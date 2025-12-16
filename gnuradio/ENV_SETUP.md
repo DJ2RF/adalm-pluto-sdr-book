@@ -34,7 +34,8 @@ sudo apt install -y \
   pkg-config \
   usbutils \
   net-tools
-2. Install GNU Radio (3.10)
+
+## 2. Install GNU Radio (3.10)
 Install GNU Radio from the Ubuntu repositories:
 
 sudo apt install -y gnuradio
@@ -46,7 +47,9 @@ Expected output (example):
 nginx
 Code kopieren
 GNU Radio Companion 3.10.5.1
-3. Install libiio & Pluto Support
+
+## 3. Install libiio & Pluto Support
+
 The ADALM-Pluto uses libiio for communication.
 
 Install libiio and GNU Radio IIO blocks
@@ -62,7 +65,9 @@ You should see the Pluto listed, e.g.:
 
 Available contexts:
   0: ip:pluto.local
-4. Connect the ADALM-Pluto
+
+## 4. Connect the ADALM-Pluto
+
 USB (default)
 Plug in the Pluto via USB
 
@@ -84,7 +89,8 @@ ping pluto.local
 or directly:
 iio_info -u ip:pluto.local
 
-5. GNU Radio Pluto Blocks
+## 5. GNU Radio Pluto Blocks
+
 After installing gr-iio, GNU Radio Companion should provide blocks such as:
 
 PlutoSDR Source
@@ -97,7 +103,8 @@ If the blocks are missing:
 Restart GNU Radio Companion
 Verify gr-iio is installed
 
-6. Python Environment (optional but recommended)
+## 6. Python Environment (optional but recommended)
+
 For Python-based SDR experiments (outside GRC), use a virtual environment.
 
 Create a virtual environment
@@ -111,7 +118,8 @@ python -c "import adi; print(adi.__version__)"
 On some systems, pyadi-iio requires a virtual environment because
 system Python packages are restricted.
 
-7. Common Pluto URI Settings
+## 7. Common Pluto URI Settings
+
 Typical Pluto URIs used in this repository:
 
 ip:pluto.local
@@ -120,7 +128,8 @@ or with static IP:
 ip:192.168.2.1
 These URIs are used consistently in all .grc flowgraphs.
 
-8. Performance & Stability Tips
+## 8. Performance & Stability Tips
+
 Disable unnecessary background applications
 
 Avoid USB hubs (connect Pluto directly)
@@ -129,7 +138,8 @@ Use sample rates ≤ 5 MS/s for stable operation
 
 Start with manual gain before using AGC
 
-9. Troubleshooting
+## 9. Troubleshooting
+
 Pluto not found
 iio_info -s
 Check USB cable
@@ -144,7 +154,8 @@ Permission issues
 sudo usermod -a -G plugdev $USER
 Log out and log in again.
 
-10. Scope of This Setup
+## 10. Scope of This Setup
+
 This setup supports:
 
 Spectrum & waterfall analysis
