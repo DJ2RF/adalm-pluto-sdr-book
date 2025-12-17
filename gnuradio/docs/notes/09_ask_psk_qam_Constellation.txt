@@ -1,0 +1,22 @@
+Operation
+
+Open, start.
+
+Change variable mode:
+
+0 = 4-ASK
+1 = BPSK
+2 = QPSK
+3 = 16-QAM
+
+
+Bedienung
+
+Öffnen, starten.
+
+Variable mode ändern:
+
+0 = 4-ASK
+1 = BPSK
+2 = QPSK
+3 = 16-QAM
