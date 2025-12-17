@@ -1,0 +1,233 @@
+options:
+  parameters:
+    author: 'DJ2RF'
+    catch_exceptions: 'True'
+    category: '[Digital Demos]'
+    comment: '2-FSK demo (no hardware) with full demod: quad demod + smoothing + slicer'
+    description: 'FSK generator -> quadrature demod -> moving average -> binary slicer -> bit plot'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: fsk_full_demod
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    title: 2-FSK Demo (Baseband) – Full Demod (Robust)
+    window_size: (1400,820)
+  states:
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '200000'
+  states:
+    coordinate: [120, 20]
+    state: enabled
+
+- name: baud
+  id: variable
+  parameters:
+    value: '1200'
+  states:
+    coordinate: [260, 20]
+    state: enabled
+
+- name: sps
+  id: variable
+  parameters:
+    value: 'int(samp_rate/baud)'
+  states:
+    coordinate: [380, 20]
+    state: enabled
+
+- name: f_dev
+  id: variable
+  parameters:
+    value: '5000'
+  states:
+    coordinate: [560, 20]
+    state: enabled
+
+- name: sens
+  id: variable
+  parameters:
+    value: '2*math.pi*f_dev/samp_rate'
+  states:
+    coordinate: [700, 20]
+    state: enabled
+
+- name: avg_len
+  id: variable
+  parameters:
+    value: 'max(1, int(sps/4))'
+  states:
+    coordinate: [900, 20]
+    state: enabled
+
+# ---- TX symbols: simple pattern (-1/+1) as float ----
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    type: float
+    vector: '[-1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0]'
+    repeat: 'True'
+    vlen: '1'
+  states:
+    coordinate: [120, 150]
+    state: true
+
+- name: blocks_repeat_0
+  id: blocks_repeat
+  parameters:
+    type: float
+    interp: sps
+  states:
+    coordinate: [360, 150]
+    state: true
+
+- name: analog_frequency_modulator_fc_0
+  id: analog_frequency_modulator_fc
+  parameters:
+    sensitivity: sens
+  states:
+    coordinate: [560, 150]
+    state: true
+
+- name: blocks_throttle_0
+  id: blocks_throttle
+  parameters:
+    type: complex
+    samples_per_second: samp_rate
+    ignoretag: 'True'
+  states:
+    coordinate: [760, 150]
+    state: true
+
+# ---- Demod: complex -> float ----
+- name: analog_quadrature_demod_cf_0
+  id: analog_quadrature_demod_cf
+  parameters:
+    gain: '1.0'
+  states:
+    coordinate: [120, 360]
+    state: true
+
+# Smooth discriminator output (simple lowpass via moving average)
+- name: blocks_moving_average_xx_0
+  id: blocks_moving_average_xx
+  parameters:
+    type: float
+    length: avg_len
+    scale: '1.0/avg_len'
+    max_iter: '4000'
+  states:
+    coordinate: [360, 360]
+    state: true
+
+# Binary slicer: float -> byte (0/1)
+- name: digital_binary_slicer_fb_0
+  id: digital_binary_slicer_fb
+  parameters: {}
+  states:
+    coordinate: [600, 360]
+    state: true
+
+# ---- GUI ----
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    fftsize: '2048'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    fc: '0'
+    bw: samp_rate
+    update_time: '0.10'
+    ymin: '-140'
+    ymax: '10'
+    legend: 'True'
+    name: '""'
+    nconnections: '1'
+    freqhalf: 'True'
+    autoscale: 'False'
+    average: '1.0'
+    grid: 'False'
+    axislabels: 'True'
+    ctrlpanel: 'False'
+    gui_hint: ''
+    label: FSK Spectrum (Baseband)
+    units: dB
+    showports: 'False'
+    norm_window: 'False'
+  states:
+    coordinate: [760, 260]
+    state: true
+
+- name: qtgui_time_sink_x_0
+  id: qtgui_time_sink_x
+  parameters:
+    type: float
+    samp_rate: samp_rate
+    size: '4000'
+    name: '""'
+    nconnections: '1'
+    update_time: '0.10'
+    ymin: '-2'
+    ymax: '2'
+    grid: 'True'
+    autoscale: 'False'
+    axislabels: 'True'
+    gui_hint: ''
+    label1: 'Discriminator (smoothed)'
+  states:
+    coordinate: [120, 520]
+    state: true
+
+- name: qtgui_time_sink_x_1
+  id: qtgui_time_sink_x
+  parameters:
+    type: byte
+    samp_rate: baud
+    size: '400'
+    name: '""'
+    nconnections: '1'
+    update_time: '0.10'
+    ymin: '-0.5'
+    ymax: '1.5'
+    grid: 'True'
+    autoscale: 'False'
+    axislabels: 'True'
+    gui_hint: ''
+    label1: 'Recovered Bits (0/1)'
+  states:
+    coordinate: [760, 520]
+    state: true
+
+connections:
+# TX
+- [blocks_vector_source_x_0, '0', blocks_repeat_0, '0']
+- [blocks_repeat_0, '0', analog_frequency_modulator_fc_0, '0']
+- [analog_frequency_modulator_fc_0, '0', blocks_throttle_0, '0']
+
+# Spectrum
+- [blocks_throttle_0, '0', qtgui_freq_sink_x_0, '0']
+
+# Demod chain
+- [blocks_throttle_0, '0', analog_quadrature_demod_cf_0, '0']
+- [analog_quadrature_demod_cf_0, '0', blocks_moving_average_xx_0, '0']
+- [blocks_moving_average_xx_0, '0', digital_binary_slicer_fb_0, '0']
+
+# GUI time
+- [blocks_moving_average_xx_0, '0', qtgui_time_sink_x_0, '0']
+- [digital_binary_slicer_fb_0, '0', qtgui_time_sink_x_1, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.5.1
