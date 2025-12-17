@@ -1,10 +1,12 @@
 options:
   parameters:
-    author: 'DJ2RF'
+    author: DJ2RF
     catch_exceptions: 'True'
     category: '[Digital Demos]'
-    comment: 'ASK / PSK / QAM constellation demo (no hardware)'
-    description: 'Generate 4-ASK, BPSK, QPSK, 16QAM and show constellation'
+    cmake_opt: ''
+    comment: ASK / PSK / QAM constellation demo (no hardware)
+    copyright: ''
+    description: Generate 4-ASK, BPSK, QPSK, 16QAM and show constellation
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: qt_gui
@@ -13,286 +15,557 @@ options:
     max_nouts: '0'
     output_language: python
     placement: (0,0)
+    qt_qss_theme: ''
     realtime_scheduling: ''
     run: 'True'
     run_command: '{python} -u {filename}'
     run_options: prompt
     sizing_mode: fixed
+    thread_safe_setters: ''
     title: ASK / PSK / QAM Constellations (Baseband)
     window_size: (1300,780)
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [0, 0.0]
+    rotation: 0
     state: enabled
 
 blocks:
-- name: samp_rate
-  id: variable
-  parameters:
-    value: '200000'
-  states:
-    coordinate: [120, 20]
-    state: enabled
-
-- name: sym_rate
-  id: variable
-  parameters:
-    value: '10000'
-  states:
-    coordinate: [260, 20]
-    state: enabled
-
-- name: sps
-  id: variable
-  parameters:
-    value: 'int(samp_rate/sym_rate)'
-  states:
-    coordinate: [400, 20]
-    state: enabled
-
-# mode: 0=4-ASK, 1=BPSK, 2=QPSK, 3=16QAM
 - name: mode
   id: variable
   parameters:
+    comment: ''
     value: '2'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [560, 20]
+    rotation: 0
     state: enabled
-
-# -------- 4-ASK (real amplitude on I, Q=0) --------
-- name: analog_random_source_x_ask
-  id: analog_random_source_x
+- name: samp_rate
+  id: variable
   parameters:
-    type: byte
-    min: '0'
-    max: '4'
-    seed: '0'
+    comment: ''
+    value: '200000'
   states:
-    coordinate: [120, 140]
-    state: true
-
-- name: digital_chunks_to_symbols_xx_ask
-  id: digital_chunks_to_symbols_xx
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 20]
+    rotation: 0
+    state: enabled
+- name: sps
+  id: variable
   parameters:
-    dimension: '1'
-    dtype: float
-    symbol_table: '[0.25, 0.5, 0.75, 1.0]'
+    comment: ''
+    value: int(samp_rate/sym_rate)
   states:
-    coordinate: [340, 140]
-    state: true
-
-- name: blocks_repeat_ask
-  id: blocks_repeat
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [400, 20]
+    rotation: 0
+    state: enabled
+- name: sym_rate
+  id: variable
   parameters:
-    type: float
-    interp: sps
+    comment: ''
+    value: '10000'
   states:
-    coordinate: [560, 140]
-    state: true
-
-- name: blocks_float_to_complex_ask
-  id: blocks_float_to_complex
-  parameters: {}
-  states:
-    coordinate: [760, 140]
-    state: true
-
-# -------- BPSK --------
-- name: analog_random_source_x_bpsk
-  id: analog_random_source_x
-  parameters:
-    type: byte
-    min: '0'
-    max: '2'
-    seed: '1'
-  states:
-    coordinate: [120, 260]
-    state: true
-
-- name: digital_chunks_to_symbols_xx_bpsk
-  id: digital_chunks_to_symbols_xx
-  parameters:
-    dimension: '1'
-    dtype: complex
-    symbol_table: '[-1+0j, 1+0j]'
-  states:
-    coordinate: [340, 260]
-    state: true
-
-- name: blocks_repeat_bpsk
-  id: blocks_repeat
-  parameters:
-    type: complex
-    interp: sps
-  states:
-    coordinate: [560, 260]
-    state: true
-
-# -------- QPSK (normalized) --------
-- name: analog_random_source_x_qpsk
-  id: analog_random_source_x
-  parameters:
-    type: byte
-    min: '0'
-    max: '4'
-    seed: '2'
-  states:
-    coordinate: [120, 380]
-    state: true
-
-- name: digital_chunks_to_symbols_xx_qpsk
-  id: digital_chunks_to_symbols_xx
-  parameters:
-    dimension: '1'
-    dtype: complex
-    symbol_table: '[0.707+0.707j, 0.707-0.707j, -0.707+0.707j, -0.707-0.707j]'
-  states:
-    coordinate: [340, 380]
-    state: true
-
-- name: blocks_repeat_qpsk
-  id: blocks_repeat
-  parameters:
-    type: complex
-    interp: sps
-  states:
-    coordinate: [560, 380]
-    state: true
-
-# -------- 16-QAM (±1,±3 normalized by sqrt(10)≈3.1623) --------
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [260, 20]
+    rotation: 0
+    state: enabled
 - name: analog_random_source_x_16qam
   id: analog_random_source_x
   parameters:
-    type: byte
-    min: '0'
+    affinity: ''
+    alias: ''
+    comment: ''
     max: '16'
-    seed: '3'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '1000'
+    repeat: 'True'
+    type: int
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [120, 500]
+    rotation: 0
     state: true
-
-- name: digital_chunks_to_symbols_xx_16qam
-  id: digital_chunks_to_symbols_xx
+- name: analog_random_source_x_ask
+  id: analog_random_source_x
   parameters:
-    dimension: '1'
-    dtype: complex
-    symbol_table: '[
-      (-3-3j)/3.1623, (-3-1j)/3.1623, (-3+1j)/3.1623, (-3+3j)/3.1623,
-      (-1-3j)/3.1623, (-1-1j)/3.1623, (-1+1j)/3.1623, (-1+3j)/3.1623,
-      ( 1-3j)/3.1623, ( 1-1j)/3.1623, ( 1+1j)/3.1623, ( 1+3j)/3.1623,
-      ( 3-3j)/3.1623, ( 3-1j)/3.1623, ( 3+1j)/3.1623, ( 3+3j)/3.1623
-    ]'
+    affinity: ''
+    alias: ''
+    comment: ''
+    max: '4'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '1000'
+    repeat: 'True'
+    type: int
   states:
-    coordinate: [340, 500]
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 140]
+    rotation: 0
     state: true
-
+- name: analog_random_source_x_bpsk
+  id: analog_random_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    max: '2'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '1000'
+    repeat: 'True'
+    type: int
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 260]
+    rotation: 0
+    state: true
+- name: analog_random_source_x_qpsk
+  id: analog_random_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    max: '4'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '1000'
+    repeat: 'True'
+    type: int
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 380]
+    rotation: 0
+    state: true
+- name: blocks_float_to_complex_ask
+  id: blocks_float_to_complex
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [760, 140]
+    rotation: 0
+    state: true
 - name: blocks_repeat_16qam
   id: blocks_repeat
   parameters:
-    type: complex
+    affinity: ''
+    alias: ''
+    comment: ''
     interp: sps
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [560, 500]
+    rotation: 0
     state: true
-
-# -------- Select one modulation stream --------
+- name: blocks_repeat_ask
+  id: blocks_repeat
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    interp: sps
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [560, 140]
+    rotation: 0
+    state: true
+- name: blocks_repeat_bpsk
+  id: blocks_repeat
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    interp: sps
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [560, 260]
+    rotation: 0
+    state: true
+- name: blocks_repeat_qpsk
+  id: blocks_repeat
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    interp: sps
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [560, 380]
+    rotation: 0
+    state: true
 - name: blocks_selector_0
   id: blocks_selector
   parameters:
-    type: complex
+    affinity: ''
+    alias: ''
+    comment: ''
+    enabled: 'True'
+    input_index: mode
+    maxoutbuf: '0'
+    minoutbuf: '0'
     num_inputs: '4'
     num_outputs: '1'
-    input_index: mode
     output_index: '0'
+    showports: 'True'
+    type: complex
+    vlen: '1'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [980, 330]
+    rotation: 0
     state: true
-
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
-    type: complex
-    samples_per_second: samp_rate
+    affinity: ''
+    alias: ''
+    comment: ''
     ignoretag: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_second: samp_rate
+    type: complex
+    vlen: '1'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [1160, 330]
+    rotation: 0
     state: true
-
-# -------- GUI sinks --------
+- name: digital_chunks_to_symbols_xx_16qam
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dimension: '1'
+    in_type: int
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    out_type: complex
+    symbol_table: '[ (-3-3j)/3.1623, (-3-1j)/3.1623, (-3+1j)/3.1623, (-3+3j)/3.1623,
+      (-1-3j)/3.1623, (-1-1j)/3.1623, (-1+1j)/3.1623, (-1+3j)/3.1623, ( 1-3j)/3.1623,
+      ( 1-1j)/3.1623, ( 1+1j)/3.1623, ( 1+3j)/3.1623, ( 3-3j)/3.1623, ( 3-1j)/3.1623,
+      ( 3+1j)/3.1623, ( 3+3j)/3.1623 ]'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [340, 500]
+    rotation: 0
+    state: true
+- name: digital_chunks_to_symbols_xx_ask
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dimension: '1'
+    in_type: int
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    out_type: float
+    symbol_table: '[0.25, 0.5, 0.75, 1.0]'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [340, 140]
+    rotation: 0
+    state: true
+- name: digital_chunks_to_symbols_xx_bpsk
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dimension: '1'
+    in_type: int
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    out_type: complex
+    symbol_table: '[-1+0j, 1+0j]'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [340, 260]
+    rotation: 0
+    state: true
+- name: digital_chunks_to_symbols_xx_qpsk
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dimension: '1'
+    in_type: int
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    out_type: complex
+    symbol_table: '[0.707+0.707j, 0.707-0.707j, -0.707+0.707j, -0.707-0.707j]'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [340, 380]
+    rotation: 0
+    state: true
 - name: qtgui_const_sink_x_0
   id: qtgui_const_sink_x
   parameters:
-    type: complex
-    size: '2048'
-    samp_rate: samp_rate
-    name: '""'
-    nconnections: '1'
-    update_time: '0.10'
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
     autoscale: 'True'
     axislabels: 'True'
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
     grid: 'True'
     gui_hint: ''
-    label1: 'Selected Constellation'
+    label1: Selected Constellation
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    legend: 'True'
+    marker1: '0'
+    marker10: '0'
+    marker2: '0'
+    marker3: '0'
+    marker4: '0'
+    marker5: '0'
+    marker6: '0'
+    marker7: '0'
+    marker8: '0'
+    marker9: '0'
+    name: '""'
+    nconnections: '1'
+    size: '2048'
+    style1: '0'
+    style10: '0'
+    style2: '0'
+    style3: '0'
+    style4: '0'
+    style5: '0'
+    style6: '0'
+    style7: '0'
+    style8: '0'
+    style9: '0'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: complex
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    xmax: '2'
+    xmin: '-2'
+    ymax: '2'
+    ymin: '-2'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [980, 470]
+    rotation: 0
     state: true
-
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
   parameters:
-    type: complex
-    fftsize: '2048'
-    wintype: window.WIN_BLACKMAN_hARRIS
-    fc: '0'
-    bw: samp_rate
-    update_time: '0.10'
-    ymin: '-140'
-    ymax: '10'
-    legend: 'True'
-    name: '""'
-    nconnections: '1'
-    freqhalf: 'True'
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
     autoscale: 'False'
     average: '1.0'
-    grid: 'False'
     axislabels: 'True'
+    bw: samp_rate
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
     ctrlpanel: 'False'
+    fc: '0'
+    fftsize: '2048'
+    freqhalf: 'True'
+    grid: 'False'
     gui_hint: ''
     label: Spectrum (Selected)
-    units: dB
-    showports: 'False'
+    label1: ''
+    label10: ''''''
+    label2: ''''''
+    label3: ''''''
+    label4: ''''''
+    label5: ''''''
+    label6: ''''''
+    label7: ''''''
+    label8: ''''''
+    label9: ''''''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
     norm_window: 'False'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    ymax: '10'
+    ymin: '-140'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [980, 610]
+    rotation: 0
     state: true
 
 connections:
-# ASK path
-- [analog_random_source_x_ask, '0', digital_chunks_to_symbols_xx_ask, '0']
-- [digital_chunks_to_symbols_xx_ask, '0', blocks_repeat_ask, '0']
-- [blocks_repeat_ask, '0', blocks_float_to_complex_ask, '0']
-
-# BPSK path
-- [analog_random_source_x_bpsk, '0', digital_chunks_to_symbols_xx_bpsk, '0']
-- [digital_chunks_to_symbols_xx_bpsk, '0', blocks_repeat_bpsk, '0']
-
-# QPSK path
-- [analog_random_source_x_qpsk, '0', digital_chunks_to_symbols_xx_qpsk, '0']
-- [digital_chunks_to_symbols_xx_qpsk, '0', blocks_repeat_qpsk, '0']
-
-# 16QAM path
 - [analog_random_source_x_16qam, '0', digital_chunks_to_symbols_xx_16qam, '0']
-- [digital_chunks_to_symbols_xx_16qam, '0', blocks_repeat_16qam, '0']
-
-# Selector inputs (0..3)
+- [analog_random_source_x_ask, '0', digital_chunks_to_symbols_xx_ask, '0']
+- [analog_random_source_x_bpsk, '0', digital_chunks_to_symbols_xx_bpsk, '0']
+- [analog_random_source_x_qpsk, '0', digital_chunks_to_symbols_xx_qpsk, '0']
 - [blocks_float_to_complex_ask, '0', blocks_selector_0, '0']
+- [blocks_repeat_16qam, '0', blocks_selector_0, '3']
+- [blocks_repeat_ask, '0', blocks_float_to_complex_ask, '0']
 - [blocks_repeat_bpsk, '0', blocks_selector_0, '1']
 - [blocks_repeat_qpsk, '0', blocks_selector_0, '2']
-- [blocks_repeat_16qam, '0', blocks_selector_0, '3']
-
-# To sinks
 - [blocks_selector_0, '0', blocks_throttle_0, '0']
 - [blocks_throttle_0, '0', qtgui_const_sink_x_0, '0']
 - [blocks_throttle_0, '0', qtgui_freq_sink_x_0, '0']
+- [digital_chunks_to_symbols_xx_16qam, '0', blocks_repeat_16qam, '0']
+- [digital_chunks_to_symbols_xx_ask, '0', blocks_repeat_ask, '0']
+- [digital_chunks_to_symbols_xx_bpsk, '0', blocks_repeat_bpsk, '0']
+- [digital_chunks_to_symbols_xx_qpsk, '0', blocks_repeat_qpsk, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.5.1
+  grc_version: 3.10.9.2
