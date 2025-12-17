@@ -1,10 +1,13 @@
 options:
   parameters:
-    author: 'DJ2RF'
+    author: DJ2RF
     catch_exceptions: 'True'
     category: '[Pluto TX/RX Digital]'
-    comment: 'QPSK TX->RX loopback. USE ATTENUATOR ONLY.'
-    description: 'Generate QPSK baseband, transmit via Pluto, receive via Pluto, show constellation.'
+    cmake_opt: ''
+    comment: QPSK TX->RX loopback. USE ATTENUATOR ONLY.
+    copyright: ''
+    description: Generate QPSK baseband, transmit via Pluto, receive via Pluto, show
+      constellation.
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: qt_gui
@@ -13,231 +16,461 @@ options:
     max_nouts: '0'
     output_language: python
     placement: (0,0)
+    qt_qss_theme: ''
     realtime_scheduling: ''
     run: 'True'
     run_command: '{python} -u {filename}'
     run_options: prompt
     sizing_mode: fixed
-    title: QPSK TX/RX Loopback (Pluto) – ATTENUATOR ONLY
+    thread_safe_setters: ''
+    title: "QPSK TX/RX Loopback (Pluto) \u2013 ATTENUATOR ONLY"
     window_size: (1400,800)
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [0, 0.0]
+    rotation: 0
     state: enabled
 
 blocks:
-- name: samp_rate
-  id: variable
-  parameters:
-    value: '1000000'
-  states:
-    coordinate: [120, 12]
-    state: enabled
-
-- name: sym_rate
-  id: variable
-  parameters:
-    value: '50000'
-  states:
-    coordinate: [300, 12]
-    state: enabled
-
-- name: sps
-  id: variable
-  parameters:
-    value: 'int(samp_rate/sym_rate)'
-  states:
-    coordinate: [470, 12]
-    state: enabled
-
 - name: f0
   id: variable
   parameters:
+    comment: ''
     value: '435000000'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [650, 12]
+    rotation: 0
     state: enabled
-
-- name: tx_atten
-  id: variable
-  parameters:
-    value: '40'
-  states:
-    coordinate: [820, 12]
-    state: enabled
-
 - name: rx_gain
   id: variable
   parameters:
+    comment: ''
     value: '40'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [980, 12]
+    rotation: 0
     state: enabled
-
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '1000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 12]
+    rotation: 0
+    state: enabled
+- name: sps
+  id: variable
+  parameters:
+    comment: ''
+    value: int(samp_rate/sym_rate)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [470, 12]
+    rotation: 0
+    state: enabled
 - name: sym_offset
   id: variable
   parameters:
-    value: 'int(sps/2)'
+    comment: ''
+    value: int(sps/2)
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [1140, 12]
+    rotation: 0
     state: enabled
-
-# ---------------- TX: QPSK baseband ----------------
+- name: sym_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '50000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [300, 12]
+    rotation: 0
+    state: enabled
+- name: tx_atten
+  id: variable
+  parameters:
+    comment: ''
+    value: '40'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [820, 12]
+    rotation: 0
+    state: enabled
 - name: analog_random_source_x_0
   id: analog_random_source_x
   parameters:
-    type: byte
-    min: '0'
+    affinity: ''
+    alias: ''
+    comment: ''
     max: '4'
-    seed: '0'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '1000'
+    repeat: 'True'
+    type: int
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [120, 150]
+    rotation: 0
     state: true
-
-- name: digital_chunks_to_symbols_xx_0
-  id: digital_chunks_to_symbols_xx
-  parameters:
-    dimension: '1'
-    dtype: complex
-    symbol_table: '[0.707+0.707j, 0.707-0.707j, -0.707+0.707j, -0.707-0.707j]'
-  states:
-    coordinate: [340, 150]
-    state: true
-
-- name: blocks_repeat_0
-  id: blocks_repeat
-  parameters:
-    type: complex
-    interp: sps
-  states:
-    coordinate: [560, 150]
-    state: true
-
-- name: blocks_multiply_const_vxx_0
-  id: blocks_multiply_const_vxx
-  parameters:
-    type: complex
-    const: '0.15'
-  states:
-    coordinate: [760, 150]
-    state: true
-
-- name: iio_pluto_sink_0
-  id: iio_pluto_sink
-  parameters:
-    uri: ip:pluto.local
-    samplerate: samp_rate
-    bandwidth: samp_rate
-    frequency: f0
-    attenuation: tx_atten
-    cyclic: 'False'
-    buffer_size: '32768'
-  states:
-    coordinate: [980, 150]
-    state: true
-
-# ---------------- RX: Pluto -> constellation ----------------
-- name: iio_pluto_source_0
-  id: iio_pluto_source
-  parameters:
-    uri: ip:pluto.local
-    samplerate: samp_rate
-    bandwidth: samp_rate
-    frequency: f0
-    gain1: '''manual'''
-    manual_gain1: rx_gain
-    quadrature: 'True'
-    rfdc: 'True'
-    bbdc: 'True'
-    buffer_size: '32768'
-    type: fc32
-  states:
-    coordinate: [120, 420]
-    state: true
-
-# Take one sample per symbol (TX uses repeat/rect pulses => OK for loopback demo)
 - name: blocks_keep_one_in_n_0
   id: blocks_keep_one_in_n
   parameters:
-    type: complex
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
     n: sps
-    offset: sym_offset
+    type: complex
+    vlen: '1'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [360, 420]
+    rotation: 0
     state: true
-
-# Carrier/phase lock (QPSK => order 4)
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '0.15'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [760, 150]
+    rotation: 0
+    state: true
+- name: blocks_repeat_0
+  id: blocks_repeat
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    interp: sps
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [560, 150]
+    rotation: 0
+    state: true
+- name: digital_chunks_to_symbols_xx_0
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dimension: '1'
+    in_type: int
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    out_type: complex
+    symbol_table: '[0.707+0.707j, 0.707-0.707j, -0.707+0.707j, -0.707-0.707j]'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [340, 150]
+    rotation: 0
+    state: true
 - name: digital_costas_loop_cc_0
   id: digital_costas_loop_cc
   parameters:
-    w: '0.02'
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
     order: '4'
     use_snr: 'False'
+    w: '0.02'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [560, 420]
+    rotation: 0
     state: true
-
-# ---------------- GUI ----------------
+- name: iio_pluto_sink_0
+  id: iio_pluto_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    attenuation1: '10.0'
+    bandwidth: samp_rate
+    buffer_size: '32768'
+    comment: ''
+    cyclic: 'False'
+    filter: ''
+    filter_source: '''Auto'''
+    fpass: '0'
+    frequency: f0
+    fstop: '0'
+    len_tag_key: ''
+    samplerate: samp_rate
+    type: fc32
+    uri: ip:pluto.local
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [980, 150]
+    rotation: 0
+    state: true
+- name: iio_pluto_source_0
+  id: iio_pluto_source
+  parameters:
+    affinity: ''
+    alias: ''
+    bandwidth: samp_rate
+    bbdc: 'True'
+    buffer_size: '32768'
+    comment: ''
+    filter: ''
+    filter_source: '''Auto'''
+    fpass: '0'
+    frequency: f0
+    fstop: '0'
+    gain1: '''manual'''
+    len_tag_key: packet_len
+    manual_gain1: rx_gain
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    quadrature: 'True'
+    rfdc: 'True'
+    samplerate: samp_rate
+    type: fc32
+    uri: ip:pluto.local
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [120, 420]
+    rotation: 0
+    state: true
 - name: qtgui_const_sink_x_0
   id: qtgui_const_sink_x
   parameters:
-    type: complex
-    size: '4096'
-    samp_rate: sym_rate
-    name: '""'
-    nconnections: '1'
-    update_time: '0.10'
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
     autoscale: 'True'
     axislabels: 'True'
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
     grid: 'True'
     gui_hint: ''
-    label1: 'QPSK Constellation (RX)'
+    label1: QPSK Constellation (RX)
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    legend: 'True'
+    marker1: '0'
+    marker10: '0'
+    marker2: '0'
+    marker3: '0'
+    marker4: '0'
+    marker5: '0'
+    marker6: '0'
+    marker7: '0'
+    marker8: '0'
+    marker9: '0'
+    name: '""'
+    nconnections: '1'
+    size: '4096'
+    style1: '0'
+    style10: '0'
+    style2: '0'
+    style3: '0'
+    style4: '0'
+    style5: '0'
+    style6: '0'
+    style7: '0'
+    style8: '0'
+    style9: '0'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: complex
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    xmax: '2'
+    xmin: '-2'
+    ymax: '2'
+    ymin: '-2'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [820, 420]
+    rotation: 0
     state: true
-
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
   parameters:
-    type: complex
-    fftsize: '2048'
-    wintype: window.WIN_BLACKMAN_hARRIS
-    fc: f0
-    bw: samp_rate
-    update_time: '0.10'
-    ymin: '-140'
-    ymax: '10'
-    legend: 'True'
-    name: '""'
-    nconnections: '1'
-    freqhalf: 'True'
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
     autoscale: 'False'
     average: '1.0'
-    grid: 'False'
     axislabels: 'True'
+    bw: samp_rate
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
     ctrlpanel: 'False'
+    fc: f0
+    fftsize: '2048'
+    freqhalf: 'True'
+    grid: 'False'
     gui_hint: ''
     label: RX Spectrum (Loopback)
-    units: dB
-    showports: 'False'
+    label1: ''
+    label10: ''''''
+    label2: ''''''
+    label3: ''''''
+    label4: ''''''
+    label5: ''''''
+    label6: ''''''
+    label7: ''''''
+    label8: ''''''
+    label9: ''''''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
     norm_window: 'False'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    ymax: '10'
+    ymin: '-140'
   states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
     coordinate: [360, 560]
+    rotation: 0
     state: true
 
 connections:
-# TX
 - [analog_random_source_x_0, '0', digital_chunks_to_symbols_xx_0, '0']
-- [digital_chunks_to_symbols_xx_0, '0', blocks_repeat_0, '0']
-- [blocks_repeat_0, '0', blocks_multiply_const_vxx_0, '0']
-- [blocks_multiply_const_vxx_0, '0', iio_pluto_sink_0, '0']
-
-# RX spectrum
-- [iio_pluto_source_0, '0', qtgui_freq_sink_x_0, '0']
-
-# RX constellation path
-- [iio_pluto_source_0, '0', blocks_keep_one_in_n_0, '0']
 - [blocks_keep_one_in_n_0, '0', digital_costas_loop_cc_0, '0']
+- [blocks_multiply_const_vxx_0, '0', iio_pluto_sink_0, '0']
+- [blocks_repeat_0, '0', blocks_multiply_const_vxx_0, '0']
+- [digital_chunks_to_symbols_xx_0, '0', blocks_repeat_0, '0']
 - [digital_costas_loop_cc_0, '0', qtgui_const_sink_x_0, '0']
+- [iio_pluto_source_0, '0', blocks_keep_one_in_n_0, '0']
+- [iio_pluto_source_0, '0', qtgui_freq_sink_x_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.5.1
+  grc_version: 3.10.9.2
