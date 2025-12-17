@@ -3,13 +3,13 @@ options:
     author: 'DJ2RF'
     catch_exceptions: 'True'
     category: '[Digital Demos]'
-    comment: 'FSK demo (no hardware): generate 2-FSK + simple demod'
-    description: '2-FSK generator + quadrature demod + clock recovery'
+    comment: '2-FSK demo (no hardware) – robust minimal version'
+    description: 'Vector symbols -> FSK mod -> spectrum + quadrature demod time view'
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: qt_gui
     hier_block_src_path: '.:'
-    id: fsk_demo
+    id: fsk_demo_min
     max_nouts: '0'
     output_language: python
     placement: (0,0)
@@ -18,7 +18,7 @@ options:
     run_command: '{python} -u {filename}'
     run_options: prompt
     sizing_mode: fixed
-    title: 2-FSK Demo (Baseband)
+    title: 2-FSK Demo (Baseband) – Minimal Robust
     window_size: (1300,780)
   states:
     state: enabled
@@ -64,27 +64,16 @@ blocks:
     coordinate: [700, 20]
     state: enabled
 
-# Random bits 0/1
-- name: analog_random_source_x_0
-  id: analog_random_source_x
+# Simple repeating symbol pattern (-1/+1), float
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
   parameters:
-    type: byte
-    min: '0'
-    max: '2'
-    seed: '0'
+    type: float
+    vector: '[-1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0]'
+    repeat: 'True'
+    vlen: '1'
   states:
     coordinate: [120, 150]
-    state: true
-
-# Map 0/1 -> -1/+1 (float symbols)
-- name: digital_chunks_to_symbols_xx_0
-  id: digital_chunks_to_symbols_xx
-  parameters:
-    dimension: '1'
-    dtype: float
-    symbol_table: '[-1.0, 1.0]'
-  states:
-    coordinate: [320, 150]
     state: true
 
 # Repeat each symbol to samples-per-symbol
@@ -94,29 +83,19 @@ blocks:
     type: float
     interp: sps
   states:
-    coordinate: [520, 150]
+    coordinate: [360, 150]
     state: true
 
-# Scale a bit (optional) to clean up demod levels
-- name: blocks_multiply_const_vxx_0
-  id: blocks_multiply_const_vxx
-  parameters:
-    type: float
-    const: '1.0'
-  states:
-    coordinate: [700, 150]
-    state: true
-
-# Frequency modulator: produces complex 2-FSK
+# Frequency modulator: float -> complex
 - name: analog_frequency_modulator_fc_0
   id: analog_frequency_modulator_fc
   parameters:
     sensitivity: sens
   states:
-    coordinate: [880, 150]
+    coordinate: [560, 150]
     state: true
 
-# Throttle (since no hardware source)
+# Throttle (no hardware)
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
@@ -124,11 +103,10 @@ blocks:
     samples_per_second: samp_rate
     ignoretag: 'True'
   states:
-    coordinate: [1060, 150]
+    coordinate: [760, 150]
     state: true
 
-# ---------- RX / Demod ----------
-# Quadrature FM demod (turn phase changes into frequency estimate)
+# Quadrature demod: complex -> float (shows instantaneous freq)
 - name: analog_quadrature_demod_cf_0
   id: analog_quadrature_demod_cf
   parameters:
@@ -137,44 +115,7 @@ blocks:
     coordinate: [120, 360]
     state: true
 
-# Low-pass to smooth discriminator output
-- name: low_pass_filter_0
-  id: low_pass_filter
-  parameters:
-    decim: '1'
-    gain: '1'
-    samp_rate: samp_rate
-    cutoff_freq: '6000'
-    transition_width: '2000'
-    window: window.WIN_HAMMING
-    beta: '6.76'
-  states:
-    coordinate: [320, 360]
-    state: true
-
-# Clock recovery (float -> float, 1 sample per symbol at output)
-- name: digital_clock_recovery_mm_xx_0
-  id: digital_clock_recovery_mm_xx
-  parameters:
-    dtype: float
-    omega: 'sps'
-    gain_omega: '0.25*0.175*0.175'
-    mu: '0.5'
-    gain_mu: '0.175'
-    omega_relative_limit: '0.005'
-  states:
-    coordinate: [540, 360]
-    state: true
-
-# Binary slicer: float -> byte (0/1)
-- name: digital_binary_slicer_fb_0
-  id: digital_binary_slicer_fb
-  parameters: {}
-  states:
-    coordinate: [760, 360]
-    state: true
-
-# ---------- GUI ----------
+# GUI: Spectrum of FSK
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
   parameters:
@@ -201,15 +142,16 @@ blocks:
     showports: 'False'
     norm_window: 'False'
   states:
-    coordinate: [1060, 260]
+    coordinate: [760, 260]
     state: true
 
+# GUI: Demod output (freq estimate)
 - name: qtgui_time_sink_x_0
   id: qtgui_time_sink_x
   parameters:
     type: float
     samp_rate: samp_rate
-    size: '2000'
+    size: '4000'
     name: '""'
     nconnections: '1'
     update_time: '0.10'
@@ -219,52 +161,21 @@ blocks:
     autoscale: 'False'
     axislabels: 'True'
     gui_hint: ''
-    label1: 'Discriminator'
+    label1: 'Quadrature Demod (freq)'
   states:
     coordinate: [120, 520]
     state: true
 
-- name: qtgui_time_sink_x_1
-  id: qtgui_time_sink_x
-  parameters:
-    type: byte
-    samp_rate: baud
-    size: '400'
-    name: '""'
-    nconnections: '1'
-    update_time: '0.10'
-    ymin: '-0.5'
-    ymax: '1.5'
-    grid: 'True'
-    autoscale: 'False'
-    axislabels: 'True'
-    gui_hint: ''
-    label1: 'Recovered Bits (0/1)'
-  states:
-    coordinate: [760, 520]
-    state: true
-
 connections:
-# TX path
-- [analog_random_source_x_0, '0', digital_chunks_to_symbols_xx_0, '0']
-- [digital_chunks_to_symbols_xx_0, '0', blocks_repeat_0, '0']
-- [blocks_repeat_0, '0', blocks_multiply_const_vxx_0, '0']
-- [blocks_multiply_const_vxx_0, '0', analog_frequency_modulator_fc_0, '0']
+- [blocks_vector_source_x_0, '0', blocks_repeat_0, '0']
+- [blocks_repeat_0, '0', analog_frequency_modulator_fc_0, '0']
 - [analog_frequency_modulator_fc_0, '0', blocks_throttle_0, '0']
 
-# GUI spectrum of generated FSK
 - [blocks_throttle_0, '0', qtgui_freq_sink_x_0, '0']
-
-# Demod path
 - [blocks_throttle_0, '0', analog_quadrature_demod_cf_0, '0']
-- [analog_quadrature_demod_cf_0, '0', low_pass_filter_0, '0']
-- [low_pass_filter_0, '0', digital_clock_recovery_mm_xx_0, '0']
-- [digital_clock_recovery_mm_xx_0, '0', digital_binary_slicer_fb_0, '0']
-
-# GUI time views
-- [low_pass_filter_0, '0', qtgui_time_sink_x_0, '0']
-- [digital_binary_slicer_fb_0, '0', qtgui_time_sink_x_1, '0']
+- [analog_quadrature_demod_cf_0, '0', qtgui_time_sink_x_0, '0']
 
 metadata:
   file_format: 1
   grc_version: 3.10.5.1
+
