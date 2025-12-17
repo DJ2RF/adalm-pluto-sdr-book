@@ -1,0 +1,243 @@
+options:
+  parameters:
+    author: 'DJ2RF'
+    catch_exceptions: 'True'
+    category: '[Pluto TX/RX Digital]'
+    comment: 'QPSK TX->RX loopback. USE ATTENUATOR ONLY.'
+    description: 'Generate QPSK baseband, transmit via Pluto, receive via Pluto, show constellation.'
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: qpsk_tx_rx_loopback
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    title: QPSK TX/RX Loopback (Pluto) – ATTENUATOR ONLY
+    window_size: (1400,800)
+  states:
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    value: '1000000'
+  states:
+    coordinate: [120, 12]
+    state: enabled
+
+- name: sym_rate
+  id: variable
+  parameters:
+    value: '50000'
+  states:
+    coordinate: [300, 12]
+    state: enabled
+
+- name: sps
+  id: variable
+  parameters:
+    value: 'int(samp_rate/sym_rate)'
+  states:
+    coordinate: [470, 12]
+    state: enabled
+
+- name: f0
+  id: variable
+  parameters:
+    value: '435000000'
+  states:
+    coordinate: [650, 12]
+    state: enabled
+
+- name: tx_atten
+  id: variable
+  parameters:
+    value: '40'
+  states:
+    coordinate: [820, 12]
+    state: enabled
+
+- name: rx_gain
+  id: variable
+  parameters:
+    value: '40'
+  states:
+    coordinate: [980, 12]
+    state: enabled
+
+- name: sym_offset
+  id: variable
+  parameters:
+    value: 'int(sps/2)'
+  states:
+    coordinate: [1140, 12]
+    state: enabled
+
+# ---------------- TX: QPSK baseband ----------------
+- name: analog_random_source_x_0
+  id: analog_random_source_x
+  parameters:
+    type: byte
+    min: '0'
+    max: '4'
+    seed: '0'
+  states:
+    coordinate: [120, 150]
+    state: true
+
+- name: digital_chunks_to_symbols_xx_0
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    dimension: '1'
+    dtype: complex
+    symbol_table: '[0.707+0.707j, 0.707-0.707j, -0.707+0.707j, -0.707-0.707j]'
+  states:
+    coordinate: [340, 150]
+    state: true
+
+- name: blocks_repeat_0
+  id: blocks_repeat
+  parameters:
+    type: complex
+    interp: sps
+  states:
+    coordinate: [560, 150]
+    state: true
+
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    type: complex
+    const: '0.15'
+  states:
+    coordinate: [760, 150]
+    state: true
+
+- name: iio_pluto_sink_0
+  id: iio_pluto_sink
+  parameters:
+    uri: ip:pluto.local
+    samplerate: samp_rate
+    bandwidth: samp_rate
+    frequency: f0
+    attenuation: tx_atten
+    cyclic: 'False'
+    buffer_size: '32768'
+  states:
+    coordinate: [980, 150]
+    state: true
+
+# ---------------- RX: Pluto -> constellation ----------------
+- name: iio_pluto_source_0
+  id: iio_pluto_source
+  parameters:
+    uri: ip:pluto.local
+    samplerate: samp_rate
+    bandwidth: samp_rate
+    frequency: f0
+    gain1: '''manual'''
+    manual_gain1: rx_gain
+    quadrature: 'True'
+    rfdc: 'True'
+    bbdc: 'True'
+    buffer_size: '32768'
+    type: fc32
+  states:
+    coordinate: [120, 420]
+    state: true
+
+# Take one sample per symbol (TX uses repeat/rect pulses => OK for loopback demo)
+- name: blocks_keep_one_in_n_0
+  id: blocks_keep_one_in_n
+  parameters:
+    type: complex
+    n: sps
+    offset: sym_offset
+  states:
+    coordinate: [360, 420]
+    state: true
+
+# Carrier/phase lock (QPSK => order 4)
+- name: digital_costas_loop_cc_0
+  id: digital_costas_loop_cc
+  parameters:
+    w: '0.02'
+    order: '4'
+    use_snr: 'False'
+  states:
+    coordinate: [560, 420]
+    state: true
+
+# ---------------- GUI ----------------
+- name: qtgui_const_sink_x_0
+  id: qtgui_const_sink_x
+  parameters:
+    type: complex
+    size: '4096'
+    samp_rate: sym_rate
+    name: '""'
+    nconnections: '1'
+    update_time: '0.10'
+    autoscale: 'True'
+    axislabels: 'True'
+    grid: 'True'
+    gui_hint: ''
+    label1: 'QPSK Constellation (RX)'
+  states:
+    coordinate: [820, 420]
+    state: true
+
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    type: complex
+    fftsize: '2048'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    fc: f0
+    bw: samp_rate
+    update_time: '0.10'
+    ymin: '-140'
+    ymax: '10'
+    legend: 'True'
+    name: '""'
+    nconnections: '1'
+    freqhalf: 'True'
+    autoscale: 'False'
+    average: '1.0'
+    grid: 'False'
+    axislabels: 'True'
+    ctrlpanel: 'False'
+    gui_hint: ''
+    label: RX Spectrum (Loopback)
+    units: dB
+    showports: 'False'
+    norm_window: 'False'
+  states:
+    coordinate: [360, 560]
+    state: true
+
+connections:
+# TX
+- [analog_random_source_x_0, '0', digital_chunks_to_symbols_xx_0, '0']
+- [digital_chunks_to_symbols_xx_0, '0', blocks_repeat_0, '0']
+- [blocks_repeat_0, '0', blocks_multiply_const_vxx_0, '0']
+- [blocks_multiply_const_vxx_0, '0', iio_pluto_sink_0, '0']
+
+# RX spectrum
+- [iio_pluto_source_0, '0', qtgui_freq_sink_x_0, '0']
+
+# RX constellation path
+- [iio_pluto_source_0, '0', blocks_keep_one_in_n_0, '0']
+- [blocks_keep_one_in_n_0, '0', digital_costas_loop_cc_0, '0']
+- [digital_costas_loop_cc_0, '0', qtgui_const_sink_x_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.5.1
