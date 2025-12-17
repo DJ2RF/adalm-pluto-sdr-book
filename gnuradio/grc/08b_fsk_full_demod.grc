@@ -3,8 +3,8 @@ options:
     author: 'DJ2RF'
     catch_exceptions: 'True'
     category: '[Digital Demos]'
-    comment: '2-FSK demo (no hardware) with full demod: quad demod + smoothing + slicer'
-    description: 'FSK generator -> quadrature demod -> moving average -> binary slicer -> bit plot'
+    comment: '2-FSK demo (no hardware) with demod: quad demod + smoothing + slicer + bit plot'
+    description: 'FSK generator -> quadrature demod -> moving average -> binary slicer -> bits'
     gen_cmake: 'On'
     gen_linking: dynamic
     generate_options: qt_gui
@@ -93,6 +93,7 @@ blocks:
     coordinate: [360, 150]
     state: true
 
+# Frequency modulator: float -> complex (2-FSK)
 - name: analog_frequency_modulator_fc_0
   id: analog_frequency_modulator_fc
   parameters:
@@ -101,6 +102,7 @@ blocks:
     coordinate: [560, 150]
     state: true
 
+# Throttle (no hardware)
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
@@ -140,6 +142,14 @@ blocks:
     coordinate: [600, 360]
     state: true
 
+# Convert byte -> float for QT time sink compatibility
+- name: blocks_uchar_to_float_0
+  id: blocks_uchar_to_float
+  parameters: {}
+  states:
+    coordinate: [780, 360]
+    state: true
+
 # ---- GUI ----
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
@@ -167,7 +177,7 @@ blocks:
     showports: 'False'
     norm_window: 'False'
   states:
-    coordinate: [760, 260]
+    coordinate: [980, 260]
     state: true
 
 - name: qtgui_time_sink_x_0
@@ -193,7 +203,7 @@ blocks:
 - name: qtgui_time_sink_x_1
   id: qtgui_time_sink_x
   parameters:
-    type: byte
+    type: float
     samp_rate: baud
     size: '400'
     name: '""'
@@ -207,7 +217,7 @@ blocks:
     gui_hint: ''
     label1: 'Recovered Bits (0/1)'
   states:
-    coordinate: [760, 520]
+    coordinate: [980, 520]
     state: true
 
 connections:
@@ -223,10 +233,11 @@ connections:
 - [blocks_throttle_0, '0', analog_quadrature_demod_cf_0, '0']
 - [analog_quadrature_demod_cf_0, '0', blocks_moving_average_xx_0, '0']
 - [blocks_moving_average_xx_0, '0', digital_binary_slicer_fb_0, '0']
+- [digital_binary_slicer_fb_0, '0', blocks_uchar_to_float_0, '0']
 
 # GUI time
 - [blocks_moving_average_xx_0, '0', qtgui_time_sink_x_0, '0']
-- [digital_binary_slicer_fb_0, '0', qtgui_time_sink_x_1, '0']
+- [blocks_uchar_to_float_0, '0', qtgui_time_sink_x_1, '0']
 
 metadata:
   file_format: 1
