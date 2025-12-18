@@ -1,4 +1,4 @@
-# ADALM-Pluto SDR – Book Resources
+# ADALM-Pluto SDR – Book Resources from https://nerdverlag.com
 
 This repository contains source code, examples, and supporting material
 for the book:
